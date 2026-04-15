@@ -39,6 +39,103 @@ If CLAUDE.md, GEMINI.md, or AGENTS.md says "don't use TDD" and a skill says "alw
 
 Skills use Claude Code tool names. Non-CC platforms: see `references/copilot-tools.md` (Copilot CLI), `references/codex-tools.md` (Codex) for tool equivalents. Gemini CLI users get the tool mapping loaded automatically via GEMINI.md.
 
+---
+
+# Always-Active Disciplines
+
+These Iron Laws are ALWAYS in effect. You do not need to invoke a skill to follow them — they apply to every action you take. The full skills remain available via the Skill tool for detailed process guidance when needed.
+
+## Iron Law: Test-Driven Development
+
+```
+NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST
+```
+
+Follow the Red-Green-Refactor cycle for all new features, bug fixes, and behavior changes:
+1. **RED** — Write one minimal failing test. Clear name, tests real behavior, one thing.
+2. **Verify RED** — Run it. Confirm it fails because the feature is missing, not a typo.
+3. **GREEN** — Write the simplest code to pass. No over-engineering.
+4. **Verify GREEN** — Run full suite. All tests pass, output pristine.
+5. **REFACTOR** — Clean up. Keep tests green.
+
+Wrote code before the test? Delete it. Start over. No exceptions.
+
+For the full process: invoke `superpowers:test-driven-development`
+
+## Iron Law: Verification Before Completion
+
+```
+NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE
+```
+
+Before ANY claim of success, completion, or correctness:
+1. **IDENTIFY** — What command proves this claim?
+2. **RUN** — Execute the full command fresh.
+3. **READ** — Full output, check exit code, count failures.
+4. **VERIFY** — Does output confirm the claim?
+5. **ONLY THEN** — Make the claim with evidence.
+
+Using "should work", "probably passes", "seems correct"? STOP. Run the command.
+
+For the full process: invoke `superpowers:verification-before-completion`
+
+## Iron Law: Systematic Debugging
+
+```
+NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST
+```
+
+For ANY bug, test failure, or unexpected behavior — complete these phases in order:
+1. **Root Cause** — Read errors carefully, reproduce, check recent changes, trace data flow.
+2. **Pattern Analysis** — Find working examples, compare, identify differences.
+3. **Hypothesis** — Form single hypothesis, test minimally, one variable at a time.
+4. **Implementation** — Create failing test, implement single fix, verify.
+
+If 3+ fixes have failed: STOP. Question the architecture. Discuss before attempting more.
+
+For the full process: invoke `superpowers:systematic-debugging`
+
+## Iron Law: Autonomous Review
+
+After completing implementation work, ALWAYS request code review before claiming done:
+1. Get git SHAs for the changed range.
+2. Dispatch `superpowers:code-reviewer` subagent with the review template.
+3. Act on feedback: fix Critical immediately, fix Important before proceeding.
+4. When receiving review feedback, verify before implementing — no performative agreement.
+
+For review templates: invoke `superpowers:requesting-code-review`
+For handling feedback: invoke `superpowers:receiving-code-review`
+
+---
+
+# Mode-Aware Skill Routing
+
+## Plan Mode Only
+
+These skills MUST ONLY be invoked during plan mode. Do NOT invoke them during implementation:
+- `superpowers:brainstorming` — design exploration and spec writing
+- `superpowers:writing-plans` — detailed implementation plan creation
+
+If you are NOT in plan mode and think you need to brainstorm or write a plan, proceed directly to implementation instead. The user will enter plan mode explicitly when they want planning.
+
+## Post-Plan-Mode Behavior
+
+After exiting plan mode, proceed directly to implementation or debugging. Do NOT:
+- Generate additional design documents or specs
+- Write more plans
+- Invoke brainstorming or writing-plans
+- Ask about execution strategy choices
+
+The plan was already created. Execute it now.
+
+## Worktree Auto-Detection
+
+If you are working in a git worktree (check: `git rev-parse --git-common-dir` differs from `git rev-parse --git-dir`), then after implementation is complete and all tests pass, automatically invoke `superpowers:finishing-a-development-branch`. Do not ask whether to invoke it — just invoke it.
+
+If you are NOT in a worktree, do not invoke finishing-a-development-branch unless the user asks.
+
+---
+
 # Using Skills
 
 ## The Rule
@@ -48,9 +145,8 @@ Skills use Claude Code tool names. Non-CC platforms: see `references/copilot-too
 ```dot
 digraph skill_flow {
     "User message received" [shape=doublecircle];
-    "About to EnterPlanMode?" [shape=doublecircle];
-    "Already brainstormed?" [shape=diamond];
-    "Invoke brainstorming skill" [shape=box];
+    "Need a process skill first?" [shape=diamond];
+    "Invoke relevant process skill" [shape=box];
     "Might any skill apply?" [shape=diamond];
     "Invoke Skill tool" [shape=box];
     "Announce: 'Using [skill] to [purpose]'" [shape=box];
@@ -59,10 +155,9 @@ digraph skill_flow {
     "Follow skill exactly" [shape=box];
     "Respond (including clarifications)" [shape=doublecircle];
 
-    "About to EnterPlanMode?" -> "Already brainstormed?";
-    "Already brainstormed?" -> "Invoke brainstorming skill" [label="no"];
-    "Already brainstormed?" -> "Might any skill apply?" [label="yes"];
-    "Invoke brainstorming skill" -> "Might any skill apply?";
+    "Need a process skill first?" -> "Invoke relevant process skill" [label="yes"];
+    "Need a process skill first?" -> "Might any skill apply?" [label="no"];
+    "Invoke relevant process skill" -> "Might any skill apply?";
 
     "User message received" -> "Might any skill apply?";
     "Might any skill apply?" -> "Invoke Skill tool" [label="yes, even 1%"];
@@ -98,11 +193,12 @@ These thoughts mean STOP—you're rationalizing:
 
 When multiple skills could apply, use this order:
 
-1. **Process skills first** (brainstorming, debugging) - these determine HOW to approach the task
-2. **Implementation skills second** (frontend-design, mcp-builder) - these guide execution
+1. **Process skills first** (systematic-debugging, test-driven-development) - these determine HOW to approach the task
+2. **Verification skills second** (verification-before-completion) - these gate completion claims
+3. **Review skills third** (requesting-code-review, receiving-code-review) - these guide peer review
 
-"Let's build X" → brainstorming first, then implementation skills.
-"Fix this bug" → debugging first, then domain-specific skills.
+"Fix this bug" → systematic-debugging first, then test-driven-development for code changes, then verification-before-completion before claiming done.
+"Add a feature" → test-driven-development, then verification-before-completion, then requesting-code-review.
 
 ## Skill Types
 
