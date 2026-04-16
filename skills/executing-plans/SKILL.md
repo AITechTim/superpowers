@@ -61,5 +61,9 @@ After all tasks complete and verified, confirm all tests pass.
 
 ## Integration
 
+**Auto-invoked before this skill (unless disabled):**
+- **superpowers:using-git-worktrees** — auto-creates an isolated workspace before execution. See `using-superpowers` for override mechanisms.
+
 **Related skills:**
 - **superpowers:writing-plans** — creates the plan this skill executes
+- **superpowers:finishing-a-development-branch** — auto-applies in worktree context after all tasks complete

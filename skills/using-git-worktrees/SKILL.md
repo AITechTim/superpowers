@@ -1,6 +1,6 @@
 ---
 name: using-git-worktrees
-description: "Use via /worktree command. Creates isolated git worktrees with smart directory selection and safety verification. Do not auto-invoke."
+description: "Use when starting non-trivial feature work or before executing implementation plans. Auto-invoked by default; disable per-session via /worktrees-off, per-project via 'superpowers.worktrees: off' in CLAUDE.md, or globally via SUPERPOWERS_WORKTREES=off env var. Also available as /worktree command."
 ---
 
 # Using Git Worktrees
@@ -208,7 +208,14 @@ Ready to implement auth feature
 
 ## Integration
 
-**Invoked via:** `/worktree` command — user decides when isolation is needed.
+**Auto-invoked by `using-superpowers`** before:
+- Executing implementation plans (`executing-plans`, `subagent-driven-development`)
+- Building new features, components, or subsystems
+- Any change touching 3+ files
+
+**Also invokable via:** `/worktree` slash command for explicit user-initiated isolation.
+
+**Disable auto-invocation:** See "Override Mechanisms" in `using-superpowers/SKILL.md`. Three layers: session (`/worktrees-off`), project (`CLAUDE.md` line `superpowers.worktrees: off`), global (`SUPERPOWERS_WORKTREES=off` env var).
 
 **Pairs with:**
 - **finishing-a-development-branch** — auto-applies when implementation completes in a worktree

@@ -128,11 +128,29 @@ After exiting plan mode, proceed directly to implementation or debugging. Do NOT
 
 The plan was already created. Execute it now.
 
-## Worktree Auto-Detection
+## Worktree Auto-Creation
 
-If you are working in a git worktree (check: `git rev-parse --git-common-dir` differs from `git rev-parse --git-dir`), then after implementation is complete and all tests pass, automatically invoke `superpowers:finishing-a-development-branch`. Do not ask whether to invoke it — just invoke it.
+Before starting non-trivial feature work, automatically invoke `superpowers:using-git-worktrees` to create an isolated workspace. This applies when:
+- Implementing a multi-step plan (executing-plans, subagent-driven-development)
+- Building a new feature, component, or subsystem
+- Any change touching 3+ files
 
-If you are NOT in a worktree, do not invoke finishing-a-development-branch unless the user asks.
+Skip auto-creation for:
+- Single-file edits, typo fixes, config tweaks
+- Debugging existing code without major changes
+- Tasks the user explicitly says are exploratory or disposable
+
+After implementation completes in a worktree (detect via `git rev-parse --git-common-dir` differing from `git rev-parse --git-dir`) and all tests pass, automatically invoke `superpowers:finishing-a-development-branch`. Do not ask — just invoke it.
+
+### Override Mechanisms
+
+Auto-creation is disabled if ANY of the following is true. Check in this order:
+
+1. **Session toggle** — User invoked `/worktrees-off` in this conversation, or said something like "don't create a worktree", "stay in this branch". A `/worktrees-on` re-enables.
+2. **Project toggle** — `CLAUDE.md` or `AGENTS.md` in the working directory contains the line `superpowers.worktrees: off` (case-insensitive).
+3. **Global toggle** — Environment variable `SUPERPOWERS_WORKTREES` is set to `off` (check via `echo "$SUPERPOWERS_WORKTREES"` in Bash).
+
+If any override is active, do NOT auto-create a worktree. The user can still explicitly invoke one via `/worktree`.
 
 ---
 

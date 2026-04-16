@@ -264,10 +264,14 @@ Done!
 
 ## Integration
 
+**Auto-invoked before this skill (unless disabled):**
+- **superpowers:using-git-worktrees** — auto-creates an isolated workspace before execution. See `using-superpowers` for override mechanisms.
+
 **Related skills:**
 - **superpowers:writing-plans** — creates the plan this skill executes
 - **superpowers:requesting-code-review** — code review template for reviewer subagents
 - **superpowers:test-driven-development** — subagents follow TDD for each task
+- **superpowers:finishing-a-development-branch** — auto-applies in worktree context after final code review
 
 **Alternative workflow:**
 - **superpowers:executing-plans** — use for parallel session instead of same-session execution
